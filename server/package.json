@@ -1,0 +1,64 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "14.17.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "debug": "^4.1.1",
+    "del": "^5.1.0",
+    "express": "^4.17.1",
+    "firebase-admin": "^11.0.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.6.6",
+    "mongoose": "^5.12.7",
+    "mongoose-paginate": "^5.0.3",
+    "morgan": "^1.9.1",
+    "multer": "^1.4.2",
+    "node-cron": "^3.0.1",
+    "node-static": "^0.7.11",
+    "numeral": "^2.0.6",
+    "path": "^0.12.7",
+    "qrcode": "^1.5.0",
+    "request": "^2.88.2",
+    "socket.io": "^2.4.1"
+  },
+  "devDependencies": {
+    "node-image-resizer": "^1.0.0",
+    "nodemon": "^2.0.12"
+  },
+  "pkg": {
+    "scripts": [
+      "api/routes/**/*.js",
+      "api/models/**/*.js",
+      "api/class/**/*.js",
+      "functions/**/*.js",
+      "middleware/**/*.js",
+      "utils/**/*.js",
+      "api/routes/**/*.js",
+      "mongo.js",
+      "dbConfig.js",
+      "getTenant.js"
+    ],
+    "targets": [
+      "node14-win-x64"
+    ],
+    "assets": [
+      "www/**/*"
+    ],
+    "outputPath": "dist"
+  },
+  "bin": "server.js"
+}
