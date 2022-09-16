@@ -1,15 +1,15 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const AdministrationCentral = require("../models/AdminCentral");
+const Marque = require("../models/marqueVehicule");
 const router = express.Router();
 let io = require("socket.io");
 
 router.post("/", async (req, res, next) => {
   try {
-    const doc = new AdministrationCentral(req.body);
-    const forma = await doc.save();
-    req.io.sockets.emit(`AdministrationCentral`, forma);
-    res.status(201).json(forma);
+    const doc = new Marque(req.body);
+    const vehicule = await doc.save();
+    req.io.sockets.emit(`Marque`, vehicule);
+    res.status(201).json(vehicule);
   } catch (error) {
     res.status(500).json(error);
   }
@@ -17,13 +17,10 @@ router.post("/", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let docs = await AdministrationCentral.find({}, "-__v")
-      .sort({ _id: -1 })
-      .lean()
-      .exec();
+    let docs = await Marque.find({}, "-__v").sort({ _id: -1 }).lean().exec();
     res.status(200).json(docs);
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).send(error);
   }
 });
 
@@ -31,7 +28,7 @@ router.delete("/:id", async (req, res, next) => {
   try {
     let Id = req.params.id;
     const filter = { _id: Id };
-    let result = await AdministrationCentral.findOneAndRemove(filter);
+    let result = await Marque.findOneAndRemove(filter);
     res.status(200).json(result);
   } catch (e) {
     console.error(e);
@@ -44,7 +41,7 @@ router.patch("/:id", async (req, res, next) => {
   const filter = { _id: Id };
   const update = req.body;
   try {
-    let result = await AdministrationCentral.findOneAndUpdate(
+    let result = await Marque.findOneAndUpdate(
       filter,
       { $set: update },
       { new: true }

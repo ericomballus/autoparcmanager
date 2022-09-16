@@ -11,6 +11,8 @@ const horsRmiaRoutes = require("./api/routes/hors-rmia");
 const brigadeRoutes = require("./api/routes/brigade");
 const bataillonRoutes = require("./api/routes/bataillon");
 const compagnieRoutes = require("./api/routes/compagnie");
+const marqueVehiculeRoutes = require("./api/routes/marque_vehicule");
+
 var path = require("path");
 const fs = require("fs");
 const { MongoClient } = require("mongodb");
@@ -113,7 +115,8 @@ app.use(
   "/administration_central",
   require("./api/routes/administration_central")
 );
-app.use("venicule", require("./api/routes/vehicule"));
+app.use("/marquedevehicule", require("./api/routes/marque_vehicule"));
+app.use("/vehicule", require("./api/routes/vehicule"));
 app.use((req, res, next) => {
   const error = new Error("Not found ");
   error.status = 404;

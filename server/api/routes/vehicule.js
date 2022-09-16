@@ -6,10 +6,21 @@ let io = require("socket.io");
 
 router.post("/", async (req, res, next) => {
   try {
-    const doc = new Vehicule(req.body);
-    const vehicule = await doc.save();
-    req.io.sockets.emit(`vehicule`, vehicule);
-    res.status(201).json(vehicule);
+    let found = await Vehicule.find({
+      $or: [
+        { numeroChassis: req.body.numeroChassis },
+        { nouvelleImmatriculation: req.body.nouvelleImmatriculation },
+        { ancienneImmatriculation: req.body.ancienneImmatriculation },
+      ],
+    });
+    if (found && found.length) {
+      res.status(402).json(found[0]);
+    } else {
+      const doc = new Vehicule(req.body);
+      const vehicule = await doc.save();
+      req.io.sockets.emit(`vehicule`, vehicule);
+      res.status(201).json(vehicule);
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -20,7 +31,9 @@ router.get("/", async (req, res, next) => {
   try {
     let docs = await Vehicule.find({}, "-__v")
       .sort({ _id: -1 })
-      // .populate("parentId")
+      .populate(
+        "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
+      )
       .lean()
       .exec();
     res.status(200).json(docs);
