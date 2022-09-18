@@ -47,10 +47,56 @@ router.get("/:byQuery", async (req, res, next) => {
     const filter = req.query;
     let docs = await Vehicule.find(filter, "-__v")
       .sort({ _id: -1 })
-      // .populate("parentId")
+      .populate(
+        "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
+      )
       .lean()
       .exec();
     res.status(200).json(docs);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+router.get("/:all/:onecategory", async (req, res, next) => {
+  console.log(req.query);
+  try {
+    const field = req.query["parent"];
+    console.log(field);
+
+    if (req.query["parent"] == "admincentralId") {
+      let docs = await Vehicule.find({
+        admincentralId: { $exists: true, $ne: null },
+      })
+        .sort({ _id: -1 })
+        .populate(
+          "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
+        )
+        .lean()
+        .exec();
+      res.status(200).json(docs);
+    } else if (req.query["parent"] == "rmiaId") {
+      let docs = await Vehicule.find({
+        rmiaId: { $exists: true, $ne: null },
+      })
+        .sort({ _id: -1 })
+        .populate(
+          "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
+        )
+        .lean()
+        .exec();
+      res.status(200).json(docs);
+    } else if (req.query["parent"] == "horsrmiaId") {
+      let docs = await Vehicule.find({
+        horsrmiaId: { $exists: true, $ne: null },
+      })
+        .sort({ _id: -1 })
+        .populate(
+          "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
+        )
+        .lean()
+        .exec();
+      res.status(200).json(docs);
+    }
   } catch (error) {
     res.status(500).json(error);
   }
