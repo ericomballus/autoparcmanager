@@ -117,6 +117,11 @@ app.use(
 );
 app.use("/marquedevehicule", require("./api/routes/marque_vehicule"));
 app.use("/vehicule", require("./api/routes/vehicule"));
+app.use("/metier", require("./api/routes/metier"));
+app.use("/formation", require("./api/routes/formation"));
+app.use("/grades", require("./api/routes/grade"));
+app.use("/employe", require("./api/routes/employe"));
+
 app.use((req, res, next) => {
   const error = new Error("Not found ");
   error.status = 404;
