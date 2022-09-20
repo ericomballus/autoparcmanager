@@ -28,15 +28,30 @@ router.post("/", async (req, res, next) => {
 });
 
 router.get("/", async (req, res, next) => {
+  let page = 1;
+  const limit = 20;
+  if (req.query.page) {
+    page = req.query.page;
+  }
   try {
     let docs = await Vehicule.find({}, "-__v")
       .sort({ _id: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
       .populate(
         "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
       )
       .lean()
       .exec();
-    res.status(200).json(docs);
+    const count = await Vehicule.countDocuments();
+    let resultat = {
+      docs,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+      itemsPerPage: limit,
+      count: count,
+    };
+    res.status(200).json(resultat);
   } catch (error) {
     res.status(500).json(error);
   }

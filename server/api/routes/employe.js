@@ -22,13 +22,28 @@ router.post("/", async (req, res, next) => {
 });
 
 router.get("/", async (req, res, next) => {
+  let page = 1;
+  const limit = 20;
+  if (req.query.page) {
+    page = req.query.page;
+  }
   try {
     let docs = await Employe.find({}, "-__v")
       .sort({ _id: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
       .populate("gradeId formationId metierId")
       .lean()
       .exec();
-    res.status(200).json(docs);
+    const count = await Employe.countDocuments();
+    let resultat = {
+      docs,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+      itemsPerPage: limit,
+      count: count,
+    };
+    res.status(200).json(resultat);
   } catch (error) {
     res.status(500).json(error);
   }
@@ -39,9 +54,7 @@ router.get("/:byQuery", async (req, res, next) => {
     const filter = req.query;
     let docs = await Employe.find(filter, "-__v")
       .sort({ _id: -1 })
-      .populate(
-        "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
-      )
+      .populate("gradeId formationId metierId")
       .lean()
       .exec();
     res.status(200).json(docs);
@@ -53,38 +66,31 @@ router.get("/:all/:onecategory", async (req, res, next) => {
   console.log(req.query);
   try {
     const field = req.query["parent"];
-    console.log(field);
 
-    if (req.query["parent"] == "admincentralId") {
+    if (req.query["parent"] == "gradeId") {
       let docs = await Employe.find({
-        admincentralId: { $exists: true, $ne: null },
+        gradeId: { $exists: true, $ne: null },
       })
         .sort({ _id: -1 })
-        .populate(
-          "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
-        )
+        .populate("gradeId formationId metierId")
         .lean()
         .exec();
       res.status(200).json(docs);
-    } else if (req.query["parent"] == "rmiaId") {
+    } else if (req.query["parent"] == "formationId") {
       let docs = await Employe.find({
-        rmiaId: { $exists: true, $ne: null },
+        formationId: { $exists: true, $ne: null },
       })
         .sort({ _id: -1 })
-        .populate(
-          "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
-        )
+        .populate("gradeId formationId metierId")
         .lean()
         .exec();
       res.status(200).json(docs);
-    } else if (req.query["parent"] == "horsrmiaId") {
+    } else if (req.query["parent"] == "metierId") {
       let docs = await Employe.find({
-        horsrmiaId: { $exists: true, $ne: null },
+        metierId: { $exists: true, $ne: null },
       })
         .sort({ _id: -1 })
-        .populate(
-          "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
-        )
+        .populate("gradeId formationId metierId")
         .lean()
         .exec();
       res.status(200).json(docs);
