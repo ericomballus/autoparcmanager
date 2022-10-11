@@ -25,7 +25,7 @@ let io = require("socket.io").listen(
         useUnifiedTopology: true,
         useNewUrlParser: true,
       };
-      const uri = process.env.MONGODB_URI || "mongodb://localhost:27017";
+      const uri = "mongodb://localhost:27017/bqg";
       mongoose.connect(uri, options, (err) => {
         if (err) {
           console.log(err);
@@ -37,6 +37,7 @@ let io = require("socket.io").listen(
             "and plateForm",
             process.platform
           );
+          require("./utils/createAdmin")();
         }
       });
       mongoose.connection.on("error", (err) => {
@@ -105,6 +106,7 @@ app.use((req, res, next) => {
 });
 
 //routes
+app.use("/home", express.static("www"));
 app.use("/armee", armeeRoutes);
 app.use("/rmia", rmiaRoutes);
 app.use("/brigade", brigadeRoutes);
@@ -121,7 +123,8 @@ app.use("/metier", require("./api/routes/metier"));
 app.use("/formation", require("./api/routes/formation"));
 app.use("/grades", require("./api/routes/grade"));
 app.use("/employe", require("./api/routes/employe"));
-
+app.use("/backup", require("./api/routes/backup_database"));
+app.use("/user", require("./api/routes/user"));
 app.use((req, res, next) => {
   const error = new Error("Not found ");
   error.status = 404;

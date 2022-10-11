@@ -29,7 +29,7 @@ router.get("/", async (req, res, next) => {
   }
   try {
     let docs = await Employe.find({}, "-__v")
-      .sort({ _id: -1 })
+      .sort({ name: 1 })
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .populate("gradeId formationId metierId")
@@ -122,7 +122,11 @@ router.patch("/:id", async (req, res, next) => {
       { $set: update },
       { new: true }
     );
-    res.status(200).json(result);
+    let doc = await Employe.findById(Id)
+      .populate("gradeId formationId metierId")
+      .lean()
+      .exec();
+    res.status(200).json(doc);
   } catch (e) {
     console.error(e);
     res.status(500).json(error);

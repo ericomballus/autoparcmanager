@@ -5,4 +5,4 @@ const MarqueVehiculeSchema = new Schema({
   created: { type: Date, default: Date.now },
   name: { type: String, default: " ", required: true },
 });
-module.exports = mongoose.model("MarqueVehicule", MarqueVehiculeSchema);
+module.exports = mongoose.model("Marquevehicule", MarqueVehiculeSchema);

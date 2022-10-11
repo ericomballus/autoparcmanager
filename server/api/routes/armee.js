@@ -17,7 +17,11 @@ router.post("/", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let docs = await Army.find({}, "-__v").sort({ _id: -1 }).lean().exec();
+    let docs = await Army.find({}, "-__v")
+      .sort({ _id: -1 })
+      .populate("parentId")
+      .lean()
+      .exec();
     res.status(200).json(docs);
   } catch (error) {
     res.status(500).send(error);

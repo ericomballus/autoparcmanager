@@ -10,7 +10,6 @@ router.post("/", async (req, res, next) => {
       $or: [
         { numeroChassis: req.body.numeroChassis },
         { nouvelleImmatriculation: req.body.nouvelleImmatriculation },
-        { ancienneImmatriculation: req.body.ancienneImmatriculation },
       ],
     });
     if (found && found.length) {
@@ -35,7 +34,7 @@ router.get("/", async (req, res, next) => {
   }
   try {
     let docs = await Vehicule.find({}, "-__v")
-      .sort({ _id: -1 })
+      .sort({ marque: 1 })
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .populate(
@@ -60,8 +59,9 @@ router.get("/", async (req, res, next) => {
 router.get("/:byQuery", async (req, res, next) => {
   try {
     const filter = req.query;
-    let docs = await Vehicule.find(filter, "-__v")
-      .sort({ _id: -1 })
+    console.log(filter);
+    let docs = await Vehicule.find(filter)
+      .sort({ marque: 1 })
       .populate(
         "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
       )
@@ -82,7 +82,7 @@ router.get("/:all/:onecategory", async (req, res, next) => {
       let docs = await Vehicule.find({
         admincentralId: { $exists: true, $ne: null },
       })
-        .sort({ _id: -1 })
+        .sort({ marque: 1 })
         .populate(
           "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
         )
@@ -93,7 +93,7 @@ router.get("/:all/:onecategory", async (req, res, next) => {
       let docs = await Vehicule.find({
         rmiaId: { $exists: true, $ne: null },
       })
-        .sort({ _id: -1 })
+        .sort({ marque: 1 })
         .populate(
           "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
         )
@@ -104,7 +104,7 @@ router.get("/:all/:onecategory", async (req, res, next) => {
       let docs = await Vehicule.find({
         horsrmiaId: { $exists: true, $ne: null },
       })
-        .sort({ _id: -1 })
+        .sort({ marque: 1 })
         .populate(
           "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
         )
@@ -115,6 +115,42 @@ router.get("/:all/:onecategory", async (req, res, next) => {
   } catch (error) {
     res.status(500).json(error);
   }
+});
+
+router.get("/:all/:vehicule/:armyId", async (req, res, next) => {
+  let arr = [];
+  try {
+    let brigade = await require("../models/Brigade").find({
+      armyId: req.params.armyId,
+    });
+
+    if (brigade && brigade.length) {
+      for await (const b of brigade) {
+        let docs = await Vehicule.find({
+          brigadeId: b._id,
+        })
+          .sort({ marque: 1 })
+          .populate(
+            "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
+          )
+          .lean()
+          .exec();
+        arr = [...arr, ...docs];
+      }
+      if (arr.length) {
+        arr = arr.sort((a, b) => {
+          if (a.marque < b.marque) {
+            return -1;
+          }
+          return 0;
+        });
+      }
+
+      res.status(200).json(arr);
+    } else {
+      res.status(200).json([]);
+    }
+  } catch (error) {}
 });
 
 router.delete("/:id", async (req, res, next) => {
@@ -139,10 +175,18 @@ router.patch("/:id", async (req, res, next) => {
       { $set: update },
       { new: true }
     );
-    res.status(200).json(result);
+    if (result) {
+      let doc = await Vehicule.find({ _id: result._id })
+        .populate(
+          "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
+        )
+        .lean()
+        .exec();
+      res.status(200).json(doc[0]);
+    }
   } catch (e) {
     console.error(e);
-    res.status(500).json(error);
+    res.status(500).json(e);
   }
 });
 

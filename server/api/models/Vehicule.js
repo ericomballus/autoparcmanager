@@ -38,8 +38,11 @@ const VehiculeSchema = new Schema({
   typeVehicule: { type: String, default: " ", required: true },
   numeroChassis: { type: String, default: " ", required: true },
   nouvelleImmatriculation: { type: String, default: " ", required: true },
-  ancienneImmatriculation: { type: String, default: " ", required: true },
-  anneeDeMiseEnService: { type: Number, default: 1, required: true },
-  observation: { type: String, default: " ", required: true },
+  ancienneImmatriculation: { type: String, default: " " },
+  anneeDeMiseEnService: { type: Number, default: null },
+  moisDeMiseEnService: { type: Number, default: null },
+  jourDeMiseEnService: { type: Number, default: null },
+  observation: { type: String, default: " " },
+  utilisateur: { type: String },
 });
 module.exports = mongoose.model("Vehicule", VehiculeSchema);
