@@ -17,8 +17,14 @@ router.post("/", async (req, res, next) => {
     } else {
       const doc = new Vehicule(req.body);
       const vehicule = await doc.save();
-      req.io.sockets.emit(`vehicule`, vehicule);
-      res.status(201).json(vehicule);
+      let docs = await Vehicule.find({ _id: vehicule._id })
+        .populate(
+          "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
+        )
+        .lean()
+        .exec();
+      req.io.sockets.emit(`vehicule`, docs[0]);
+      res.status(201).json(docs[0]);
     }
   } catch (error) {
     console.log(error);
@@ -67,7 +73,23 @@ router.get("/:byQuery", async (req, res, next) => {
       )
       .lean()
       .exec();
-    res.status(200).json(docs);
+    if (docs.length > 0) {
+      res.status(200).json(docs);
+    } else {
+      let obj = {};
+      for (const key in filter) {
+        obj[key] = filter[key].toUpperCase();
+      }
+      console.log(filter);
+      let result = await Vehicule.find(obj)
+        .sort({ marque: 1 })
+        .populate(
+          "rmiaId horsrmiaId compagnieId brigadeId bataillonId admincentralId"
+        )
+        .lean()
+        .exec();
+      res.status(200).json(result);
+    }
   } catch (error) {
     res.status(500).json(error);
   }
@@ -169,6 +191,7 @@ router.patch("/:id", async (req, res, next) => {
   let Id = req.params.id;
   const filter = { _id: Id };
   const update = req.body;
+  console.log(update);
   try {
     let result = await Vehicule.findOneAndUpdate(
       filter,
